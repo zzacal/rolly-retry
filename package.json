@@ -4,7 +4,8 @@
   "description": "Retry function calls if they fail",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
