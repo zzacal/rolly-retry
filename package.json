@@ -1,0 +1,27 @@
+{
+  "name": "rolly-retry",
+  "version": "1.0.0",
+  "description": "Retry function calls if they fail",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zzacal/rolly-retry.git"
+  },
+  "keywords": [
+    "retry",
+    "failover",
+    "backoff",
+    "error",
+    "handling",
+    "graceful"
+  ],
+  "author": "Zac Zacal <jizacal@gmail.com> (https://github.com/zzacal)",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/zzacal/rolly-retry/issues"
+  },
+  "homepage": "https://github.com/zzacal/rolly-retry#readme"
+}
