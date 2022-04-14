@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Retry function calls if they fail",
   "main": "dist/index.js",
+  "module": "dist/index.d.js",
   "scripts": {
     "test": "jest",
     "build": "tsc"
@@ -27,6 +28,7 @@
   "homepage": "https://github.com/zzacal/rolly-retry#readme",
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "eslint": "^8.13.0",
     "ts-jest": "^27.1.4"
   }
 }
