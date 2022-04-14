@@ -30,7 +30,9 @@ describe("retry", () => {
 describe("retry-async", () => {
   it("should retry failed funcs", async () => {
     let result = "";
-    await retryAsync([async () => Promise.resolve(result += "a")], (test) => test === "aaa", 4);
+    const appendResultAsync = async (val: string): Promise<string> => Promise.resolve(result += val);
+
+    await retryAsync([async () => await appendResultAsync("a")], (test) => test === "aaa", 4);
     expect(result).toBe("aaa");
   });
 
