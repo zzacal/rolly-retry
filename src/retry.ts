@@ -1,9 +1,9 @@
 export const retry = <T>(
   funcs: Array<() => T>,
   success: (result: T) => boolean = () => false,
-  tries: number = 1
+  tries = 1
 ) => {
-  funcs.reduce((result: boolean, current: Function) => {
+  funcs.reduce((result: boolean, current: () => T) => {
     if (result == true) {
       return result;
     }

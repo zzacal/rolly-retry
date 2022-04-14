@@ -6,7 +6,8 @@
   "module": "dist/index.d.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
   "homepage": "https://github.com/zzacal/rolly-retry#readme",
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
     "eslint": "^8.13.0",
     "ts-jest": "^27.1.4"
   }
