@@ -4,6 +4,7 @@
   "description": "Retry function calls if they fail",
   "main": "dist/index.js",
   "module": "dist/index.d.js",
+  "files": ["dist/**/*"],
   "scripts": {
     "test": "jest",
     "build": "tsc",
