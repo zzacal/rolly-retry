@@ -6,7 +6,7 @@
   "module": "dist/index.d.js",
   "files": ["dist/**/*"],
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jestconfig.json",
     "build": "tsc",
     "lint": "eslint"
   },
