@@ -30,10 +30,25 @@ describe("retry", () => {
 describe("retry-async", () => {
   it("should retry failed funcs", async () => {
     let result = "";
-    const appendResultAsync = async (val: string): Promise<string> => Promise.resolve(result += val);
+    const someFunc = async (val: string): Promise<string> => Promise.resolve(result += val);
 
-    await retryAsync([async () => await appendResultAsync("a")], (test) => test === "aaa", 4);
+    await retryAsync([async () => await someFunc("a")], (test) => test === "aaa", 4);
     expect(result).toBe("aaa");
+  });
+
+  it("should retry multiple failed funcs until success", async () => {
+    let result = "";
+    const someFunc = async (val: string): Promise<string> => Promise.resolve(result += val);
+    const otherFunc = async (): Promise<string> => Promise.resolve(result += "b");
+
+    await retryAsync(
+      [
+        async () => await someFunc("a"),
+        async () => await otherFunc(),
+      ],
+      (test) => test === "aaaabb",
+      4);
+    expect(result).toBe("aaaabb");
   });
 
   it("should call all funcs", async () => {
