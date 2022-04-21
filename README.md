@@ -4,9 +4,7 @@ A retry, failover library with types.
 
 ## Usage
 
-### Retry until a criteria is matched
-
-#### retry one asynchronous function
+### retry one asynchronous function
 ```typescript
   let result = "";
   const someFunc = async (val: string): Promise<string> 
@@ -21,7 +19,7 @@ A retry, failover library with types.
   expect(result).toBe("aaa");
 ```
 
-#### retry n async functions
+### retry n async functions
 ```typescript
   let result = "";
   const someFunc = async (val: string): Promise<string> => Promise.resolve(result += val);
@@ -39,7 +37,42 @@ A retry, failover library with types.
   expect(result).toBe("aaaabb");
 ```
 
-#### synchronous
+### retrying with backoff
+You can pass a back off to the retry. The back off will cause a delay after the first retry.
+Backoffs reset for each function.
+
+```typescript
+  const start = Date.now();
+  let calls = 0;
+  let durations: number[] = []
+  const someFunc = async (val: number): Promise<number> => {
+    durations.push(Date.now() - start);
+    return Promise.resolve(++calls)
+  };
+
+  await retryAsync(
+    [
+      async () => await someFunc(1)
+    ], 
+    (test) => false, // all tries will call 
+    3, // try this many calls
+    { 
+      constant: 10, // constant delay after first try
+      linear: 20    // linear delay after first try
+    }); 
+  expect(calls).toBe(3);
+
+  /**      
+    Call  Constant  Linear  Delay TotalMs
+    0:    0         0       0     0
+    1:    10        20      30    30
+    2:    10        40      50    80
+  */
+  expect(durations[1]).toBeGreaterThanOrEqual(30);
+  expect(durations[2]).toBeGreaterThanOrEqual(80);
+```
+
+### synchronous
 ```typescript
 import { retry } from "rolly-retry";
 
@@ -47,6 +80,7 @@ let result = "";
 retry([() => (result += "a")], (test) => test === "aaa", 4);
 expect(result).toBe("aaa");
 ```
+Retry is not yet supported on sync calls
 
 ## Install
 

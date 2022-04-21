@@ -75,3 +75,88 @@ describe("retry-async", () => {
   });
 
 })
+
+describe("backoff", () => {
+  it("should delay when constant is set", async () => {
+    let calls = 0;
+    const someFunc = async (val: number): Promise<number> => Promise.resolve(++calls);
+
+    const start = Date.now();
+    await retryAsync(
+      [
+        async () => await someFunc(1)
+      ], 
+      (test) => false, // all tries will call 
+      3, // try this many calls
+      {constant: 20}); // constant delay after first try
+    const length = Date.now() - start;
+    expect(calls).toBe(3);
+
+    /**      
+      Call  Delay TotalMs
+      0:    0     0
+      1:    20    20
+      2:    20    40
+    */
+    expect(length).toBeGreaterThanOrEqual(40);
+  });
+
+  it("should delay when linear is set", async () => {
+    const start = Date.now();
+    let calls = 0;
+    let durations: number[] = []
+    const someFunc = async (val: number): Promise<number> => {
+      durations.push(Date.now() - start);
+      return Promise.resolve(++calls)
+    };
+
+    await retryAsync(
+      [
+        async () => await someFunc(1)
+      ], 
+      (test) => false, // all tries will call 
+      3, // try this many calls
+      {linear: 20}); // linear delay after first try
+    expect(calls).toBe(3);
+
+    /**      
+      Call  Delay TotalMs
+      0:    0     0
+      1:    20    20
+      2:    40    60
+    */
+    expect(durations[1]).toBeGreaterThanOrEqual(20);
+    expect(durations[2]).toBeGreaterThanOrEqual(60);
+  });
+
+  it("should delay when combined backoff is set", async () => {
+    const start = Date.now();
+    let calls = 0;
+    let durations: number[] = []
+    const someFunc = async (val: number): Promise<number> => {
+      durations.push(Date.now() - start);
+      return Promise.resolve(++calls)
+    };
+
+    await retryAsync(
+      [
+        async () => await someFunc(1)
+      ], 
+      (test) => false, // all tries will call 
+      3, // try this many calls
+      { 
+        constant: 10, // constant delay after first try
+        linear: 20    // linear delay after first try
+      }); 
+    expect(calls).toBe(3);
+
+    /**      
+      Call  Constant  Linear  Delay TotalMs
+      0:    0         0       0     0
+      1:    10        20      30    30
+      2:    10        40      50    80
+    */
+    expect(durations[1]).toBeGreaterThanOrEqual(30);
+    expect(durations[2]).toBeGreaterThanOrEqual(80);
+  });
+})

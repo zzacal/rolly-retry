@@ -21,26 +21,19 @@ const retryOne = async <T>(
   backoff: Backoff,
   index: number = 0
 ): Promise<boolean> => {
-  await delay(index, backoff.constant, backoff.linear, backoff.exponential);
-  return tries > 0
-    ? success(await func()) ||
-        retryOne(func, success, tries - 1, backoff, index + 1)
-    : false;
+  if(tries > 0){
+    // TODO: delay should take a () => Promise
+    await delay(index, backoff.constant, backoff.linear);
+    return success(await func()) ||
+      retryOne(func, success, tries - 1, backoff, index + 1)
+  }  
+  return false;
 };
 
-const delay = async (
-  x: number = 0,
-  constant: number = 0,
-  linear: number = 0,
-  exponential: { base: number; coefficient: number } = {
-    base: 0,
-    coefficient: 1,
-  }
-) => {
+const delay = async ( x: number, constant: number = 0, linear: number = 0) => {
   // Let's not worry about the first attempt.
   if (x > 0) {
-    const { base, coefficient} = exponential;
-    const ms = constant + x * linear + x * (base ^ coefficient);
+    const ms = constant + x * linear;
     return new Promise((res) => setTimeout(res, ms));
   }
 };
@@ -48,5 +41,4 @@ const delay = async (
 type Backoff = {
   constant?: number;
   linear?: number;
-  exponential?: { base: number; coefficient: number };
 };
