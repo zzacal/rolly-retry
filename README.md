@@ -11,7 +11,7 @@ A retry, failover library with types.
     => Promise.resolve(result += val);
 
   // retry appendResult until it returns "aaa" 
-  await retryAsync(
+  await retry(
     [async () => await func_i_want_to_try("a")], 
     (test) => test === "aaa",
     4
@@ -28,7 +28,7 @@ A retry, failover library with types.
 
   // run the given functions in order
   // try each 4 times until the result is "aaaabb" (happens on second call of func_to_try_as_backup)
-  await retryAsync(
+  await retry(
     [
       async () => await func_i_want_to_try("a"),
       async () => await func_to_try_as_backup(),
@@ -52,7 +52,7 @@ Backoffs reset for each function.
     return Promise.resolve(++calls)
   };
 
-  await retryAsync(
+  await retry(
     [
       async () => await func_i_want_to_try(1)
     ], 
@@ -80,10 +80,9 @@ Backoffs reset for each function.
 import { retry } from "rolly-retry";
 
 let result = "";
-retry([() => (result += "a")], (test) => test === "aaa", 4);
+await retry([() => (result += "a")], (test) => test === "aaa", 4);
 expect(result).toBe("aaa");
 ```
-Backoff is not yet supported on sync calls
 
 ## Install
 
