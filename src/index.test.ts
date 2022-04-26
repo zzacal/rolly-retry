@@ -1,14 +1,14 @@
-import { retry, retryAsync } from "./";
+import { retry } from "./";
 
-describe("retry", () => {
-  it("should retry failed funcs", () => {
+describe("retry sync", () => {
+  it("should retry failed funcs", async () => {
     let result = "";
-    retry([() => (result += "a")], (test) => test === "aaa", 4);
+    await retry([() => (result += "a")], (test) => test === "aaa", 4);
     expect(result).toBe("aaa");
   });
-  it("should call all funcs", () => {
+  it("should call all funcs", async () => {
     let result = "";
-    retry([
+    await retry([
       () => (result += "a"),
       () => (result += "b"),
       () => (result += "c"),
@@ -16,79 +16,77 @@ describe("retry", () => {
     expect(result).toBe("abc");
   });
 
-  it("should call all funcs until success", () => {
+  it("should call all funcs until success", async () => {
     let result = "";
-    retry(
+    await retry(
       [() => (result += "a"), () => (result += "b"), () => (result += "c")],
       (test) => test === "ab"
     );
     expect(result).toBe("ab");
   });
-
 });
 
-describe("retry-async", () => {
+describe("retry", () => {
   it("should retry failed funcs", async () => {
     let result = "";
-    const someFunc = async (val: string): Promise<string> => Promise.resolve(result += val);
+    const someFunc = async (val: string): Promise<string> =>
+      Promise.resolve((result += val));
 
-    await retryAsync([async () => await someFunc("a")], (test) => test === "aaa", 4);
+    await retry([async () => await someFunc("a")], (test) => test === "aaa", 4);
     expect(result).toBe("aaa");
   });
 
   it("should retry multiple failed funcs until success", async () => {
     let result = "";
-    const someFunc = async (val: string): Promise<string> => Promise.resolve(result += val);
-    const otherFunc = async (): Promise<string> => Promise.resolve(result += "b");
+    const someFunc = async (val: string): Promise<string> =>
+      Promise.resolve((result += val));
+    const otherFunc = async (): Promise<string> =>
+      Promise.resolve((result += "b"));
 
-    await retryAsync(
-      [
-        async () => await someFunc("a"),
-        async () => await otherFunc(),
-      ],
+    await retry(
+      [async () => await someFunc("a"), async () => await otherFunc()],
       (test) => test === "aaaabb",
-      4);
+      4
+    );
     expect(result).toBe("aaaabb");
   });
 
   it("should call all funcs", async () => {
     let result = "";
-    await retryAsync([
-      async () => Promise.resolve(result += "a"),
-      async () => Promise.resolve(result += "b"),
-      async () => Promise.resolve(result += "c"),
+    await retry([
+      async () => Promise.resolve((result += "a")),
+      async () => Promise.resolve((result += "b")),
+      async () => Promise.resolve((result += "c")),
     ]);
     expect(result).toBe("abc");
   });
 
   it("should call all funcs until success", async () => {
     let result = "";
-    await retryAsync(
+    await retry(
       [
-        async () => Promise.resolve(result += "a"), 
-        async () => Promise.resolve(result += "b"), 
-        async () => Promise.resolve(result += "c")
+        async () => Promise.resolve((result += "a")),
+        async () => Promise.resolve((result += "b")),
+        async () => Promise.resolve((result += "c")),
       ],
       (test) => test === "ab"
     );
     expect(result).toBe("ab");
   });
-
-})
+});
 
 describe("backoff", () => {
   it("should delay when constant is set", async () => {
     let calls = 0;
-    const someFunc = async (val: number): Promise<number> => Promise.resolve(++calls);
+    const someFunc = async (): Promise<number> => Promise.resolve(++calls);
 
     const start = Date.now();
-    await retryAsync(
-      [
-        async () => await someFunc(1)
-      ], 
-      (test) => false, // all tries will call 
+    await retry(
+      [async () => await someFunc()],
+      () => false, // all tries will call
       3, // try this many calls
-      {constant: 20}); // constant delay after first try
+      { constant: 20 }
+    ); // constant delay after first try
     const length = Date.now() - start;
     expect(calls).toBe(3);
 
@@ -104,19 +102,18 @@ describe("backoff", () => {
   it("should delay when linear is set", async () => {
     const start = Date.now();
     let calls = 0;
-    let durations: number[] = []
-    const someFunc = async (val: number): Promise<number> => {
+    const durations: number[] = [];
+    const someFunc = async (): Promise<number> => {
       durations.push(Date.now() - start);
-      return Promise.resolve(++calls)
+      return Promise.resolve(++calls);
     };
 
-    await retryAsync(
-      [
-        async () => await someFunc(1)
-      ], 
-      (test) => false, // all tries will call 
+    await retry(
+      [async () => await someFunc()],
+      () => false, // all tries will call
       3, // try this many calls
-      {linear: 20}); // linear delay after first try
+      { linear: 20 }
+    ); // linear delay after first try
     expect(calls).toBe(3);
 
     /**      
@@ -132,22 +129,21 @@ describe("backoff", () => {
   it("should delay when combined backoff is set", async () => {
     const start = Date.now();
     let calls = 0;
-    let durations: number[] = []
-    const someFunc = async (val: number): Promise<number> => {
+    const durations: number[] = [];
+    const someFunc = async (): Promise<number> => {
       durations.push(Date.now() - start);
-      return Promise.resolve(++calls)
+      return Promise.resolve(++calls);
     };
 
-    await retryAsync(
-      [
-        async () => await someFunc(1)
-      ], 
-      (test) => false, // all tries will call 
+    await retry(
+      [async () => await someFunc()],
+      () => false, // all tries will call
       3, // try this many calls
-      { 
+      {
         constant: 10, // constant delay after first try
-        linear: 20    // linear delay after first try
-      }); 
+        linear: 20, // linear delay after first try
+      }
+    );
     expect(calls).toBe(3);
 
     /**      
@@ -159,4 +155,4 @@ describe("backoff", () => {
     expect(durations[1]).toBeGreaterThanOrEqual(30);
     expect(durations[2]).toBeGreaterThanOrEqual(80);
   });
-})
+});

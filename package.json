@@ -1,7 +1,7 @@
 {
   "name": "rolly-retry",
-  "version": "1.2.2",
-  "description": "Retry function calls if they fail",
+  "version": "2.0.0",
+  "description": "Retries one or more functions and consecutively checks for success.",
   "main": "dist/index.js",
   "module": "dist/index.d.js",
   "files": [
@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "test": "jest",
+    "clean": "rm -rf node_modules dist",
     "build": "tsc",
     "lint": "eslint",
     "prepare": "npm run build",
