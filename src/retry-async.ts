@@ -4,9 +4,27 @@
  */
 type Retriable<T> = (() => Promise<T>) | (() => T);
 type Backoff = {
-  constant?: number;
-  linear?: number;
+  constant: number;
+  linear: number;
 };
+
+/**
+ * Retries a function and checks for success.
+ * @param {(() => Promise<T>) | (() => T)} funcs - function to be retried
+ * @param {() => boolean} success - evaluates the result of the functions for success
+ * @param {number} tries - the number of times each function is tried
+ * @param {{ constant?: number; linear?: number; }} backoff - the backoff behavior applied to each function
+ *
+ * By default no calls are categorized successful without a success function.
+ */
+export function retry<T>(
+  func: (() => Promise<T>) | (() => T),
+  success?: (result: T) => boolean,
+  tries?: number,
+  backoff?: {
+    constant?: number;
+    linear?: number;
+  }): Promise<boolean>
 
 /**
  * Retries one or more functions and consecutively checks for success.
@@ -17,19 +35,32 @@ type Backoff = {
  *
  * By default no calls are categorized successful without a success function.
  */
-export const retry = async <T>(
+ export function retry<T>(
   funcs: Array<(() => Promise<T>) | (() => T)>,
+  success?: (result: T) => boolean,
+  tries?: number,
+  backoff?: {
+    constant?: number;
+    linear?: number;
+  }): Promise<boolean>;
+
+export async function retry<T>(
+  funcs: Array<(() => Promise<T>) | (() => T)> | (() => Promise<T>) | (() => T),
   success: (result: T) => boolean = () => false,
   tries = 1,
   backoff: {
     constant?: number;
     linear?: number;
   } = {}
-) => {
-  for (let i = 0; i < funcs.length; i++) {
-    if (await retryOne(funcs[i], success, tries, backoff)) {
-      return true;
+) {
+  if (Array.isArray(funcs)) {
+    for (let i = 0; i < funcs.length; i++) {
+      if (await retryOne(funcs[i], success, tries, backoff)) {
+        return true;
+      }
     }
+  } else {
+    await retryOne(funcs, success, tries, backoff);
   }
   return false;
 };
@@ -38,7 +69,7 @@ const retryOne = async <T>(
   func: Retriable<T>,
   success: (result: T) => boolean,
   tries: number,
-  backoff: Backoff,
+  backoff: Partial<Backoff>,
   index = 0
 ): Promise<boolean> => {
   if (tries > 0) {

@@ -4,39 +4,42 @@ A retry, failover library with types.
 
 ## Usage
 
-### retry one asynchronous function
+### retry one async function
 ```typescript
-  let result = "";
-  const func_i_want_to_try = async (val: string): Promise<string> 
-    => Promise.resolve(result += val);
+import { retry } from "rolly-retry";
 
-  // retry appendResult until it returns "aaa" 
-  await retry(
-    [async () => await func_i_want_to_try("a")], 
-    (test) => test === "aaa",
-    4
-  );
-
-  expect(result).toBe("aaa");
+/**
+* call retriable_func("value")
+* until the result === "success"
+* up to 4 times
+*/
+await retry(
+  async () => await retriable_func("value"), 
+  (result) => result === "success",
+  4
+);
 ```
 
-### retry n async functions
+### retry and failover
 ```typescript
-  let result = "";
-  const func_i_want_to_try = async (val: string): Promise<string> => Promise.resolve(result += val);
-  const func_to_try_as_backup = async (): Promise<string> => Promise.resolve(result += "b");
+import { retry } from "rolly-retry";
 
-  // run the given functions in order
-  // try each 4 times until the result is "aaaabb" (happens on second call of func_to_try_as_backup)
-  await retry(
-    [
-      async () => await func_i_want_to_try("a"),
-      async () => await func_to_try_as_backup(),
-    ],
-    (test) => test === "aaaabb",
-    4
-  );
-  expect(result).toBe("aaaabb");
+/**
+* call primary_retriable()
+* until the result === "success"
+* up to 4 times
+* otherwise, call backup_retriable()
+* until the result === "success"
+* up to 4 times
+*/
+await retry(
+  [
+    async () => await primary_retriable(),
+    async () => await backup_retriable(),
+  ],
+  (result) => result === "success",
+  4
+);
 ```
 
 ### retrying with backoff
@@ -44,35 +47,26 @@ You can pass a back off to the retry. The back off will cause a delay after the 
 Backoffs reset for each function.
 
 ```typescript
-  const start = Date.now();
-  let calls = 0;
-  let durations: number[] = []
-  const func_i_want_to_try = async (val: number): Promise<number> => {
-    durations.push(Date.now() - start);
-    return Promise.resolve(++calls)
-  };
+import { retry } from "rolly-retry";
 
-  await retry(
-    [
-      async () => await func_i_want_to_try(1)
-    ], 
-    (test) => false, // all tries will call 
-    3, // try this many calls
-    { 
-      constant: 10, // constant delay after first try
-      linear: 20    // linear delay after first try
-    }
-  );
-  expect(calls).toBe(3);
-
-  /**      
-    Call  Constant  Linear  Delay TotalMs
-    0:    0         0       0     0
-    1:    10        20      30    30
-    2:    10        40      50    80
-  */
-  expect(durations[1]).toBeGreaterThanOrEqual(30);
-  expect(durations[2]).toBeGreaterThanOrEqual(80);
+await retry(
+  [
+    async () => await func_i_want_to_try(1)
+  ], 
+  (test) => false,
+  3,
+  { 
+    constant: 10, // constant 10ms delay after first try
+    linear: 20    // linear X20ms delay after first try
+  }
+);
+expect(calls).toBe(3);
+/**      
+ * Call  Constant  Linear  Delay TotalMs
+ * 0:    0         0       0     0
+ * 1:    10        20      30    30
+ * 2:    10        40      50    80
+*/
 ```
 
 ### synchronous
@@ -80,7 +74,7 @@ Backoffs reset for each function.
 import { retry } from "rolly-retry";
 
 let result = "";
-await retry([() => (result += "a")], (test) => test === "aaa", 4);
+await retry(() => (result += "a"), (test) => test === "aaa", 4);
 expect(result).toBe("aaa");
 ```
 

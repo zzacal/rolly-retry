@@ -1,9 +1,9 @@
 import { retry } from "./";
 
 describe("retry sync", () => {
-  it("should retry failed funcs", async () => {
+  it("should retry failed func", async () => {
     let result = "";
-    await retry([() => (result += "a")], (test) => test === "aaa", 4);
+    await retry(() => (result += "a"), (test) => test === "aaa", 4);
     expect(result).toBe("aaa");
   });
   it("should call all funcs", async () => {
