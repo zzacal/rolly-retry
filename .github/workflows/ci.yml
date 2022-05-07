@@ -40,3 +40,24 @@ jobs:
         run: npm run build
       - name: Run tests
         run: npm run test -- --coverage --ci
+      - name: Coverage Diff
+        # You may pin to the exact commit or the version.
+        # uses: GreatWizard/coverage-diff-action@a8493a0691192563017ec317e9879c9a17a4d36c
+        uses: GreatWizard/coverage-diff-action@v1.0.8
+        with:
+          # A GitHub token to write comments and write the badge to the wiki.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Path of the json-summary file to analyze.
+          coverage-filename: coverage/coverage-final.json
+          # Name of the json file containing the repository's default branch json-summary stored in the repo wiki.
+          # base-summary-filename: # optional, default is base-summary.json
+          # If true, it will not fail even if the current branch's coverage is lower than the default branch's coverage.
+          # allowed-to-fail: # optional, default is false
+          # Whether or not a badge will be generated and stored.
+          # badge-enabled: # optional, default is true
+          # Name of the json file containing badge informations stored in the repo wiki.
+          # badge-filename: # optional, default is coverage-diff-badge.json
+          # If the coverage percentage is above or equal to this value, the badge will be green.
+          # badge-threshold-green: # optional, default is 100
+          # If the coverage percentage is not green and above or equal to this value, the badge will be orange. Otherwise it will be red.
+          # badge-threshold-orange: # optional, default is 70
