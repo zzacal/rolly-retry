@@ -9,6 +9,8 @@
   ],
   "scripts": {
     "test": "jest",
+    "test:coverage": "npm test -- --coverage",
+    "test:badges": "npm run test:coverage  && jest-coverage-badges output ./badges",
     "clean": "rm -rf node_modules dist",
     "build": "tsc",
     "lint": "eslint",
@@ -42,12 +44,13 @@
     "@typescript-eslint/parser": "^5.22.0",
     "eslint": "^8.15.0",
     "jest": "^28.1.0",
+    "jest-coverage-badges": "^1.1.2",
     "ts-jest": "^28.0.1",
     "typescript": "^4.6.4"
   },
   "jest": {
     "coverageReporters": [
-      "json-summary", 
+      "json-summary",
       "text",
       "lcov"
     ],
