@@ -44,5 +44,14 @@
     "jest": "^28.1.0",
     "ts-jest": "^28.0.1",
     "typescript": "^4.6.4"
+  },
+  "jest": {
+    "coverageReporters": [
+      "json-summary", 
+      "text",
+      "lcov"
+    ],
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   }
 }
