@@ -2,6 +2,16 @@
 
 A retry, failover library with types.
 
+## Status
+![npm](https://img.shields.io/npm/v/rolly-retry?style=flat) 
+![npm](https://img.shields.io/npm/dt/rolly-retry)
+
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/zzacal/rolly-retry)
+
+![build](https://github.com/zzacal/rolly-retry/actions/workflows/ci.yml/badge.svg)
+
+![GitHub](https://img.shields.io/github/license/zzacal/rolly-retry)
+
 ## Usage
 
 ### retry one async function
