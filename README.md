@@ -67,7 +67,7 @@ await retry(
   [
     async () => await func_i_want_to_try(1)
   ], 
-  (test) => false,
+  (result) => false,
   3,
   { 
     constant: 10, // constant 10ms delay after first try
@@ -87,9 +87,9 @@ expect(calls).toBe(3);
 ```typescript
 import { retry } from "rolly-retry";
 
-let result = "";
-await retry(() => (result += "a"), (test) => test === "aaa", 4);
-expect(result).toBe("aaa");
+let value = "";
+await retry(() => (value += "a"), (result) => result === "aaa", 4);
+expect(value).toBe("aaa");
 ```
 
 ## Install

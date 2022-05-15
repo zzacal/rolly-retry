@@ -1,6 +1,6 @@
 {
   "name": "rolly-retry",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Retries one or more functions and consecutively checks for success.",
   "main": "dist/index.js",
   "module": "dist/index.d.js",

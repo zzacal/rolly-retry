@@ -11,7 +11,7 @@ type Backoff = {
 /**
  * Retries a function and checks for success.
  * @param {(() => Promise<T>) | (() => T)} funcs - function to be retried
- * @param {() => boolean} success - evaluates the result of the functions for success
+ * @param {(result: T) => boolean} success - evaluates the result of the functions for success
  * @param {number} tries - the number of times each function is tried
  * @param {{ constant?: number; linear?: number; }} backoff - the backoff behavior applied to each function
  *
@@ -29,7 +29,7 @@ export function retry<T>(
 /**
  * Retries one or more functions and consecutively checks for success.
  * @param {Array<(() => Promise<T>) | (() => T)>} funcs - functions to be retried
- * @param {() => boolean} success - evaluates the result of the functions for success
+ * @param {(result: T) => boolean} success - evaluates the result of the functions for success
  * @param {number} tries - the number of times each function is tried
  * @param {{ constant?: number; linear?: number; }} backoff - the backoff behavior applied to each function
  *
