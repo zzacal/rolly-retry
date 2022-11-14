@@ -15,6 +15,11 @@ A retry, failover library with types.
 
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/zzacal/rolly-retry)
 
+## Motivation
+
+1. I needed a way to call a function n times until the call succeeds.
+1. I needed to be able to define a successful call.
+1. I wanted to try calling 1 or more different functions until one succeeded.
 
 ## Usage
 
@@ -98,8 +103,15 @@ expect(value).toBe("aaa");
 npm i rolly-retry
 ```
 
-## Motivation
+## Avoid
 
-This can help add resiliency to systems where calls may sometimes fail. 
+### Unrelated calls
 
-For example, if your write path is unavailable in one region, you can call a system in another region.
+Function calls within a `retry(func | [funcs])` operation are essentially synchronous. If you want to asynchronously retry many unrelated functions start multiple retries. e.g.,
+```typescript
+import { retry } from "rolly-retry";
+
+const retryOne = retry(funcGroupOne, successOne, 2);
+const retryTwo = retry(funcGroupTwo, successTwo, 2);
+const allResults = await Promise.allSettled([retryOne, retryTwo]);
+```

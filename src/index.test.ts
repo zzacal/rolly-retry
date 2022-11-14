@@ -32,7 +32,8 @@ describe("retry", () => {
     const someFunc = async (val: string): Promise<string> =>
       Promise.resolve((result += val));
 
-    await retry([async () => await someFunc("a")], (test) => test === "aaa", 4);
+    const call = retry(async () => await someFunc("a"), (test) => test === "aaa", 4);
+    await Promise.allSettled([call]);
     expect(result).toBe("aaa");
   });
 
