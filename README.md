@@ -13,8 +13,6 @@ A retry, failover library with types.
 ![coverage](./badges/badge-branches.svg)
 ![coverage](./badges/badge-lines.svg)
 
-![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/zzacal/rolly-retry)
-
 ## Motivation
 
 1. I needed a way to call a function n times until the call succeeds.
